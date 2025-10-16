@@ -1,83 +1,40 @@
-import { TokenBalance } from '../types/index';
+// Token utility functions for Digital House
 
-// CoinGecko IDs for tokens
-export const COINGECKO_IDS = {
+export const COINGECKO_IDS: { [key: string]: string } = {
   ETH: 'ethereum',
   USDC: 'usd-coin',
-  OP: 'optimism',
-  PAPAYOS: 'papayos'
+  PYUSD: 'paypal-usd'
 };
 
-// Base URL for CoinGecko images
-const COINGECKO_IMAGE_URL = 'https://assets.coingecko.com/coins/images';
-
-// Fallback images in case CoinGecko fails
-const FALLBACK_IMAGES = {
-  ETH: '/images/ethereum.png',
-  USDC: '/images/usdc.png',
-  OP: '/images/optimism.png',
-  PAPAYOS: '/ppytoken.jpg',
-  DEFAULT: '/images/token-default.png'
-};
-
-/**
- * Get token logo URL from CoinGecko
- * @param tokenSymbol The token symbol (ETH, USDC, etc)
- * @returns The URL to the token logo
- */
 export function getTokenLogoUrl(tokenSymbol: string): string {
-  const symbol = tokenSymbol.toUpperCase();
-  const id = COINGECKO_IDS[symbol];
+  const logos: { [key: string]: string } = {
+    ETH: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+    USDC: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png',
+    PYUSD: 'https://cryptologos.cc/logos/paypal-usd-pyusd-logo.png'
+  };
   
-  if (!id) {
-    return FALLBACK_IMAGES[symbol] || FALLBACK_IMAGES.DEFAULT;
-  }
-  
-  // For ETH: https://assets.coingecko.com/coins/images/279/large/ethereum.png
-  // For USDC: https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png
-  // For OP: https://assets.coingecko.com/coins/images/25244/large/Optimism.png
-  switch (symbol) {
-    case 'ETH':
-      return `${COINGECKO_IMAGE_URL}/279/large/ethereum.png`;
-    case 'USDC':
-      return `${COINGECKO_IMAGE_URL}/6319/large/USD_Coin_icon.png`;
-    case 'OP':
-      return `${COINGECKO_IMAGE_URL}/25244/large/Optimism.png`;
-    case 'PAPAYOS':
-      return '/ppytoken.jpg';
-    default:
-      return FALLBACK_IMAGES.DEFAULT;
-  }
+  return logos[tokenSymbol] || 'https://via.placeholder.com/40';
 }
 
-/**
- * Get network logo URL
- * @param networkId The network ID (10 for Optimism)
- * @returns The URL to the network logo
- */
-export function getNetworkLogoUrl(networkId: number): string {
-  switch (networkId) {
-    case 10: // Optimism
-      return `${COINGECKO_IMAGE_URL}/25244/small/Optimism.png`;
-    default:
-      return '/images/network-default.png';
-  }
+export function getNetworkLogoUrl(chainId: number): string {
+  const logos: { [key: number]: string } = {
+    1: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+    11155111: 'https://cryptologos.cc/logos/ethereum-eth-logo.png', // Ethereum Sepolia
+    421614: 'https://cryptologos.cc/logos/arbitrum-arb-logo.png', // Arbitrum Sepolia
+    84532: 'https://avatars.githubusercontent.com/u/108554348?s=280&v=4' // Base Sepolia
+  };
+  
+  return logos[chainId] || 'https://via.placeholder.com/40';
 }
 
-/**
- * Format token balance for display
- * @param balance The balance as a string
- * @param decimals Number of decimals to display
- * @returns Formatted balance string
- */
 export function formatTokenBalance(balance: string, decimals: number = 6): string {
-  const value = parseFloat(balance);
-  if (isNaN(value)) return '0.00';
+  const num = parseFloat(balance);
+  if (isNaN(num)) return '0.00';
   
-  // For very small amounts, don't show scientific notation
-  if (value < 0.000001 && value > 0) {
-    return '< 0.000001';
-  }
+  if (num === 0) return '0.00';
+  if (num < 0.01) return '< 0.01';
   
-  return value.toFixed(decimals);
-} 
+  return num.toFixed(decimals);
+}
+
+

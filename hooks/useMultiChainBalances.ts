@@ -1,53 +1,54 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createPublicClient, http, formatUnits } from 'viem';
-import { mainnet, optimism, base } from 'viem/chains';
+import { sepolia, arbitrumSepolia, baseSepolia } from 'viem/chains';
 import { TokenBalance } from '../types/index';
 
-// Chain configurations with proper RPC endpoints
+// Chain configurations with proper RPC endpoints for Sepolia testnets
 const CHAINS = {
-  1: { 
+  11155111: { 
     chain: {
-      ...mainnet,
+      ...sepolia,
       rpcUrls: {
-        default: { http: ['https://eth.llamarpc.com'] },
-        public: { http: ['https://eth.llamarpc.com'] }
+        default: { http: ['https://rpc.sepolia.org'] },
+        public: { http: ['https://rpc.sepolia.org'] }
       }
     }, 
-    name: 'Ethereum' 
+    name: 'Ethereum Sepolia' 
   },
-  10: { 
+  421614: { 
     chain: {
-      ...optimism,
+      ...arbitrumSepolia,
       rpcUrls: {
-        default: { http: ['https://mainnet.optimism.io'] },
-        public: { http: ['https://mainnet.optimism.io'] }
+        default: { http: ['https://sepolia-rollup.arbitrum.io/rpc'] },
+        public: { http: ['https://sepolia-rollup.arbitrum.io/rpc'] }
       }
     }, 
-    name: 'Optimism' 
+    name: 'Arbitrum Sepolia' 
   },
-  8453: { 
+  84532: { 
     chain: {
-      ...base,
+      ...baseSepolia,
       rpcUrls: {
-        default: { http: ['https://mainnet.base.org'] },
-        public: { http: ['https://mainnet.base.org'] }
+        default: { http: ['https://sepolia.base.org'] },
+        public: { http: ['https://sepolia.base.org'] }
       }
     }, 
-    name: 'Base' 
+    name: 'Base Sepolia' 
   }
 };
 
-// Token contracts by chain - using correct addresses
+// Token contracts by chain - using Sepolia testnet addresses
 const TOKEN_CONTRACTS = {
-  1: { // Ethereum Mainnet
-    USDC: '0xA0b86a33E6441E0b8C3C5C9c6a0b5e3b8b3b3b3b', // USDC on Ethereum (6 decimals)
+  11155111: { // Ethereum Sepolia
+    USDC: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238', // USDC on Sepolia (6 decimals)
+    PYUSD: '0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9' // PYUSD on Sepolia (6 decimals)
   },
-  10: { // Optimism  
-    USDC: '0x0b2c639c533813f4aa9d7837caf62653d097ff85', // Native Circle USDC (6 decimals)
-    PAPAYOS: '0xfeEF2ce2B94B8312EEB05665e2F03efbe3B0a916' // PAPAYOS (18 decimals)
+  421614: { // Arbitrum Sepolia
+    USDC: '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d', // USDC on Arbitrum Sepolia (6 decimals)
+    PYUSD: '0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1' // PYUSD on Arbitrum Sepolia (6 decimals)
   },
-  8453: { // Base
-    USDC: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', // Native Circle USDC (6 decimals)
+  84532: { // Base Sepolia
+    USDC: '0x036CbD53842c5426634e7929541eC2318f3dCF7e' // USDC on Base Sepolia (6 decimals)
   }
 };
 
@@ -64,11 +65,11 @@ const ERC20_ABI = [
 /**
  * Hook to fetch token balances across multiple chains
  */
-export function useMultiChainBalances(address: string | undefined, chainId: number = 10) {
+export function useMultiChainBalances(address: string | undefined, chainId: number = 11155111) {
   const [balances, setBalances] = useState<TokenBalance>({ 
     ethBalance: '0', 
     uscBalance: '0',
-    papayosBalance: '0'
+    pyusdBalance: '0'
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -110,27 +111,27 @@ export function useMultiChainBalances(address: string | undefined, chainId: numb
         }
       }
       
-      // Fetch PAPAYOS balance (only on Optimism)
-      let papayosBalance = BigInt(0);
-      if (chainId === 10) {
-        const papayosContract = TOKEN_CONTRACTS[10].PAPAYOS;
+      // Fetch PYUSD balance (on Ethereum Sepolia and Arbitrum Sepolia)
+      let pyusdBalance = BigInt(0);
+      const pyusdContract = TOKEN_CONTRACTS[chainId as keyof typeof TOKEN_CONTRACTS]?.PYUSD;
+      if (pyusdContract) {
         try {
           const result = await client.readContract({
-            address: papayosContract as `0x${string}`,
+            address: pyusdContract as `0x${string}`,
             abi: ERC20_ABI,
             functionName: 'balanceOf',
             args: [address as `0x${string}`],
           });
-          papayosBalance = result as bigint;
+          pyusdBalance = result as bigint;
         } catch (err) {
-          console.error('Error fetching PAPAYOS balance:', err);
+          console.error('Error fetching PYUSD balance:', err);
         }
       }
       
       setBalances({
         ethBalance: formatUnits(ethBalance, 18),
         uscBalance: formatUnits(usdcBalance, 6),
-        papayosBalance: formatUnits(papayosBalance, 18),
+        pyusdBalance: formatUnits(pyusdBalance, 6),
       });
       
     } catch (err) {

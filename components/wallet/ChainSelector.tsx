@@ -1,23 +1,23 @@
 import { useState } from 'react';
 import { useWallets } from '@privy-io/react-auth';
-import { mainnet, optimism, base } from 'viem/chains';
+import { sepolia, arbitrumSepolia, baseSepolia } from 'viem/chains';
 
 const SUPPORTED_CHAINS = [
   {
-    ...mainnet,
-    name: 'Ethereum',
-    logo: '/images/ethereum.png',
+    ...sepolia,
+    name: 'Ethereum Sepolia',
+    logo: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
     color: '#627EEA'
   },
   {
-    ...optimism,
-    name: 'Optimism',
-    logo: '/images/optimism.png', 
-    color: '#FF0420'
+    ...arbitrumSepolia,
+    name: 'Arbitrum Sepolia',
+    logo: 'https://cryptologos.cc/logos/arbitrum-arb-logo.png', 
+    color: '#28A0F0'
   },
   {
-    ...base,
-    name: 'Base',
+    ...baseSepolia,
+    name: 'Base Sepolia',
     logo: 'https://avatars.githubusercontent.com/u/108554348?s=280&v=4',
     color: '#0052FF'
   }

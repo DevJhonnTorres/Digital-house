@@ -28,7 +28,7 @@ const WalletInfo: React.FC<WalletInfoProps> = ({
   
   // States for send token modal
   const [isSendModalOpen, setIsSendModalOpen] = useState(false);
-  const [selectedToken, setSelectedToken] = useState<'ETH' | 'USDC' | 'PAPAYOS'>('ETH');
+  const [selectedToken, setSelectedToken] = useState<'ETH' | 'USDC' | 'PYUSD'>('ETH');
   const [isSendingTx, setIsSendingTx] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
   
@@ -42,13 +42,10 @@ const WalletInfo: React.FC<WalletInfoProps> = ({
   // Generate QR code URL using a public QR code service
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${wallet.address}`;
   
-  // Get token logo URLs from CoinGecko
+  // Get token logo URLs
   const ethLogoUrl = getTokenLogoUrl('ETH');
   const usdcLogoUrl = getTokenLogoUrl('USDC');
-  const papayosLogoUrl = getTokenLogoUrl('PAPAYOS');
-  
-  // Get Optimism network logo
-  const optimismLogoUrl = getNetworkLogoUrl(10); // 10 is Optimism Mainnet chain ID
+  const pyusdLogoUrl = getTokenLogoUrl('PYUSD');
   
   // Calculate USD values
   const ethPrice = getPriceForToken('ETH');
@@ -56,9 +53,9 @@ const WalletInfo: React.FC<WalletInfoProps> = ({
   
   const ethValueUsd = parseFloat(balances.ethBalance) * ethPrice.price;
   const usdcValueUsd = parseFloat(balances.uscBalance) * usdcPrice.price;
-  // For PAPAYOS, we'll assume $0 price for now since it might not be on CoinGecko
-  const papayosValueUsd = 0;
-  const totalValueUsd = ethValueUsd + usdcValueUsd + papayosValueUsd;
+  // PYUSD is pegged to USD, so price is $1
+  const pyusdValueUsd = parseFloat(balances.pyusdBalance) * 1;
+  const totalValueUsd = ethValueUsd + usdcValueUsd + pyusdValueUsd;
   
   // Format USD values
   const formatUsd = (value: number) => {
@@ -80,7 +77,7 @@ const WalletInfo: React.FC<WalletInfoProps> = ({
   };
   
   // Handle opening the send token modal
-  const openSendModal = (token: 'ETH' | 'USDC' | 'PAPAYOS') => {
+  const openSendModal = (token: 'ETH' | 'USDC' | 'PYUSD') => {
     setSelectedToken(token);
     setIsSendModalOpen(true);
   };
@@ -109,17 +106,15 @@ const WalletInfo: React.FC<WalletInfoProps> = ({
           params: [{
             from: wallet.address,
             to: recipient,
-            value: valueHex,
-            chainId: 10 // Optimism
+            value: valueHex
           }]
         });
         
         setTxHash(tx as string);
         
       } else if (selectedToken === 'USDC') {
-        // USDC contract integration
-        // Native USDC issued by Circle on Optimism
-        const USDC_ADDRESS = '0x0b2c639c533813f4aa9d7837caf62653d097ff85';
+        // USDC contract integration - need to determine address based on current chain
+        const USDC_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'; // Default Sepolia
         
         // ERC20 transfer function ABI
         const transferAbi = [{
@@ -149,15 +144,14 @@ const WalletInfo: React.FC<WalletInfoProps> = ({
           params: [{
             from: wallet.address,
             to: USDC_ADDRESS,
-            data: data,
-            chainId: 10 // Optimism
+            data: data
           }]
         });
         
         setTxHash(tx as string);
-      } else if (selectedToken === 'PAPAYOS') {
-        // PAPAYOS contract integration
-        const PAPAYOS_ADDRESS = '0xfeEF2ce2B94B8312EEB05665e2F03efbe3B0a916';
+      } else if (selectedToken === 'PYUSD') {
+        // PYUSD contract integration - need to determine address based on current chain
+        const PYUSD_ADDRESS = '0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9'; // Default Ethereum Sepolia
         
         // ERC20 transfer function ABI
         const transferAbi = [{
@@ -171,14 +165,14 @@ const WalletInfo: React.FC<WalletInfoProps> = ({
           type: 'function'
         }] as const;
         
-        // Convert the amount to proper units (PAPAYOS has 18 decimals)
-        const papayosAmount = parseUnits(amount, 18);
+        // Convert the amount to proper units (PYUSD has 6 decimals)
+        const pyusdAmount = parseUnits(amount, 6);
         
         // Encode the function call data using viem
         const data = encodeFunctionData({
           abi: transferAbi,
           functionName: 'transfer',
-          args: [recipient as `0x${string}`, papayosAmount]
+          args: [recipient as `0x${string}`, pyusdAmount]
         });
         
         // Create the transaction
@@ -186,9 +180,8 @@ const WalletInfo: React.FC<WalletInfoProps> = ({
           method: 'eth_sendTransaction',
           params: [{
             from: wallet.address,
-            to: PAPAYOS_ADDRESS,
-            data: data,
-            chainId: 10 // Optimism
+            to: PYUSD_ADDRESS,
+            data: data
           }]
         });
         
@@ -223,17 +216,6 @@ const WalletInfo: React.FC<WalletInfoProps> = ({
   
   return (
     <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-lg mt-4">
-      {/* Network indicator */}
-      <div className="flex justify-end mb-4">
-        <div className="flex items-center bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-3 py-1.5 rounded-full text-sm font-medium">
-          <img 
-            src={optimismLogoUrl}
-            alt="Optimism Logo" 
-            className="w-4 h-4 mr-2 rounded-full"
-          />
-          <span>Optimism Network</span>
-        </div>
-      </div>
       
       <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Your Wallet</h3>
       
@@ -274,14 +256,14 @@ const WalletInfo: React.FC<WalletInfoProps> = ({
                 >
                   📋 Copy
                 </button>
-                <a 
-                  href={`https://optimistic.etherscan.io/address/${wallet.address}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
-                >
-                  🔍 View
-                </a>
+              <a 
+                href={`https://sepolia.etherscan.io/address/${wallet.address}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+              >
+                🔍 View
+              </a>
               </div>
             </div>
           </div>
@@ -372,26 +354,26 @@ const WalletInfo: React.FC<WalletInfoProps> = ({
               </div>
             </div>
             
-            {/* PAPAYOS Balance */}
+            {/* PYUSD Balance */}
             <div className="bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 p-4 shadow-sm hover:shadow transition-shadow duration-200">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <img src={papayosLogoUrl} alt="PAPAYOS" className="w-10 h-10 rounded-full" />
+                  <img src={pyusdLogoUrl} alt="PYUSD" className="w-10 h-10 rounded-full" />
                   <div>
-                    <div className="font-medium text-gray-800 dark:text-gray-200">PAPAYOS</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">PAPAYOS</div>
+                    <div className="font-medium text-gray-800 dark:text-gray-200">PayPal USD</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">PYUSD</div>
                   </div>
                 </div>
                 <div className="flex-1 sm:text-right">
                   <div className="font-semibold text-lg text-gray-800 dark:text-white">
-                    {formatTokenBalance(balances.papayosBalance, 6)}
+                    {formatTokenBalance(balances.pyusdBalance, 6)}
                   </div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {formatUsd(papayosValueUsd)}
+                    {formatUsd(pyusdValueUsd)}
                   </div>
                 </div>
                 <button 
-                  onClick={() => openSendModal('PAPAYOS')} 
+                  onClick={() => openSendModal('PYUSD')} 
                   className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
                 >
                   Send
@@ -422,7 +404,7 @@ const WalletInfo: React.FC<WalletInfoProps> = ({
                 {txHash.substring(0, 10)}...{txHash.substring(txHash.length - 8)}
               </code>
               <a 
-                href={`https://optimistic.etherscan.io/tx/${txHash}`}
+                href={`https://sepolia.etherscan.io/tx/${txHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700"
@@ -451,7 +433,7 @@ const WalletInfo: React.FC<WalletInfoProps> = ({
           onClose={() => setIsSendModalOpen(false)}
           onSend={handleSendToken}
           tokenType={selectedToken}
-          balance={selectedToken === 'ETH' ? balances.ethBalance : selectedToken === 'USDC' ? balances.uscBalance : balances.papayosBalance}
+          balance={selectedToken === 'ETH' ? balances.ethBalance : selectedToken === 'USDC' ? balances.uscBalance : balances.pyusdBalance}
           isSending={isSendingTx}
           txHash={txHash}
           initialRecipient={scannedAddress || ''}

@@ -10,7 +10,7 @@ export function useTokenBalances(address: string | undefined) {
   const [balances, setBalances] = useState<TokenBalance>({
     ethBalance: '0',
     uscBalance: '0',
-    papayosBalance: '0',
+    pyusdBalance: '0',
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

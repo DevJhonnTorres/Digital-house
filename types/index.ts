@@ -1,19 +1,16 @@
-// Wallet types
+// Type definitions for Digital House
+
 export interface Wallet {
   address: string;
-  chainId?: number;
-  provider?: any;
   walletClientType?: string;
 }
 
-// Balance types
 export interface TokenBalance {
   ethBalance: string;
   uscBalance: string;
-  papayosBalance: string;
+  pyusdBalance: string;
 }
 
-// Network types
 export interface Network {
   id: number;
   name: string;
@@ -25,33 +22,11 @@ export interface Network {
   color: string;
 }
 
-// User types
-export interface UserInfo {
-  id: string;
-  email?: {
-    address: string;
-    verified: boolean;
-  };
-  phone?: {
-    number: string;
-    verified: boolean;
-  };
+export interface Token {
+  symbol: string;
+  name: string;
+  decimals: number;
+  address?: string;
+  icon: string;
 }
 
-// API response types
-export interface ApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  message?: string;
-}
-
-export interface WalletResponse {
-  userId: string;
-  walletAddress: string;
-}
-
-export interface BalanceResponse {
-  address: string;
-  balances: TokenBalance;
-} 

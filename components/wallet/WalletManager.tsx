@@ -14,7 +14,7 @@ export default function WalletManager() {
   const { user } = usePrivy();
   const { wallets, ready } = useWallets(); // Connected wallets (ready for transactions)
   const [selectedWalletIndex, setSelectedWalletIndex] = useState(0);
-  const [selectedChainId, setSelectedChainId] = useState(10); // Default to Optimism
+  const [selectedChainId, setSelectedChainId] = useState(11155111); // Default to Ethereum Sepolia
   const [validatedWallets, setValidatedWallets] = useState<typeof wallets>([]);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 

@@ -1,50 +1,50 @@
-import { mainnet, optimism, base } from 'viem/chains';
+import { sepolia, arbitrumSepolia, baseSepolia } from 'viem/chains';
 
 /**
- * Supported chains configuration for ETH CALI Wallet
- * All are Tier 3 EVM chains with full Privy support
+ * Supported chains configuration for Digital House
+ * Using Sepolia testnets for development and testing
  */
 
 export const SUPPORTED_CHAINS = {
-  ethereum: {
-    id: 1,
-    name: 'Ethereum',
+  ethereumSepolia: {
+    id: 11155111,
+    name: 'Ethereum Sepolia',
     nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
     rpcUrls: {
-      default: { http: ['https://eth.llamarpc.com'] },
+      default: { http: ['https://rpc.sepolia.org'] },
     },
     blockExplorers: {
-      default: { name: 'Etherscan', url: 'https://etherscan.io' },
+      default: { name: 'Etherscan', url: 'https://sepolia.etherscan.io' },
     },
-    viemChain: mainnet,
-    logo: '/images/ethereum.png',
+    viemChain: sepolia,
+    logo: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
     color: '#627EEA'
   },
-  optimism: {
-    id: 10,
-    name: 'Optimism',
+  arbitrumSepolia: {
+    id: 421614,
+    name: 'Arbitrum Sepolia',
     nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
     rpcUrls: {
-      default: { http: ['https://mainnet.optimism.io'] },
+      default: { http: ['https://sepolia-rollup.arbitrum.io/rpc'] },
     },
     blockExplorers: {
-      default: { name: 'Optimistic Etherscan', url: 'https://optimistic.etherscan.io' },
+      default: { name: 'Arbiscan', url: 'https://sepolia.arbiscan.io' },
     },
-    viemChain: optimism,
-    logo: '/images/optimism.png',
-    color: '#FF0420'
+    viemChain: arbitrumSepolia,
+    logo: 'https://cryptologos.cc/logos/arbitrum-arb-logo.png',
+    color: '#28A0F0'
   },
-  base: {
-    id: 8453,
-    name: 'Base',
+  baseSepolia: {
+    id: 84532,
+    name: 'Base Sepolia',
     nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
     rpcUrls: {
-      default: { http: ['https://mainnet.base.org'] },
+      default: { http: ['https://sepolia.base.org'] },
     },
     blockExplorers: {
-      default: { name: 'BaseScan', url: 'https://basescan.org' },
+      default: { name: 'BaseScan', url: 'https://sepolia.basescan.org' },
     },
-    viemChain: base,
+    viemChain: baseSepolia,
     logo: 'https://avatars.githubusercontent.com/u/108554348?s=280&v=4',
     color: '#0052FF'
   }
@@ -52,7 +52,7 @@ export const SUPPORTED_CHAINS = {
 
 export type SupportedChainId = keyof typeof SUPPORTED_CHAINS;
 
-export const DEFAULT_CHAIN: SupportedChainId = 'optimism';
+export const DEFAULT_CHAIN: SupportedChainId = 'ethereumSepolia';
 
 /**
  * Get chain configuration by ID

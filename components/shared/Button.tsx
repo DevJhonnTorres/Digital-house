@@ -21,91 +21,32 @@ const Button: React.FC<ButtonProps> = ({
   disabled = false,
   className = '',
 }) => {
-  // Define base styles
-  const baseStyles = `
-    font-family: inherit;
-    border-radius: 4px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  `;
-  
-  // Define variant styles
-  const variantStyles = {
-    primary: `
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      &:hover:not(:disabled) {
-        background-color: #3D53D9;
-      }
-    `,
-    secondary: `
-      background-color: var(--bg-secondary);
-      color: var(--text-color);
-      border: 1px solid var(--card-border);
-      &:hover:not(:disabled) {
-        background-color: var(--bg-tertiary);
-      }
-    `,
-    outline: `
-      background-color: transparent;
-      color: var(--primary-color);
-      border: 1px solid var(--primary-color);
-      &:hover:not(:disabled) {
-        background-color: rgba(75, 102, 243, 0.1);
-      }
-    `,
+  // Define variant classes
+  const variantClasses = {
+    primary: 'bg-blue-600 text-white border-none hover:bg-blue-700',
+    secondary: 'bg-gray-200 text-gray-800 border border-gray-300 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600',
+    outline: 'bg-transparent text-blue-600 border border-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-400 dark:hover:bg-blue-900/20',
   };
   
-  // Define size styles
-  const sizeStyles = {
-    small: `
-      padding: 0.5rem 1rem;
-      font-size: 0.875rem;
-    `,
-    medium: `
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-    `,
-    large: `
-      padding: 1rem 2rem;
-      font-size: 1.125rem;
-    `,
+  // Define size classes
+  const sizeClasses = {
+    small: 'px-4 py-2 text-sm',
+    medium: 'px-6 py-3 text-base',
+    large: 'px-8 py-4 text-lg',
   };
   
-  // Define disabled styles
-  const disabledStyles = `
-    opacity: 0.6;
-    cursor: not-allowed;
-  `;
-  
-  // Define full width styles
-  const fullWidthStyles = `
-    width: 100%;
-  `;
+  const baseClasses = 'font-medium rounded-md transition-all duration-200 inline-flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2';
+  const disabledClasses = disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer';
+  const fullWidthClasses = fullWidth ? 'w-full' : '';
   
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`button ${className}`}
+      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${disabledClasses} ${fullWidthClasses} ${className}`}
     >
       {children}
-      
-      <style jsx>{`
-        .button {
-          ${baseStyles}
-          ${variantStyles[variant]}
-          ${sizeStyles[size]}
-          ${disabled ? disabledStyles : ''}
-          ${fullWidth ? fullWidthStyles : ''}
-        }
-      `}</style>
     </button>
   );
 };

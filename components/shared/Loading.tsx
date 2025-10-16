@@ -13,63 +13,26 @@ const Loading: React.FC<LoadingProps> = ({
 }) => {
   // Define spinner sizes
   const spinnerSizes = {
-    small: 20,
-    medium: 30,
-    large: 40
+    small: 'w-5 h-5',
+    medium: 'w-8 h-8',
+    large: 'w-12 h-12'
+  };
+  
+  const textSizes = {
+    small: 'text-sm',
+    medium: 'text-base',
+    large: 'text-lg'
   };
   
   const spinnerSize = spinnerSizes[size];
+  const textSize = textSizes[size];
   
   return (
-    <div className={`loading-container ${fullScreen ? 'fullscreen' : ''}`}>
+    <div className={`flex flex-col items-center justify-center p-4 ${fullScreen ? 'fixed inset-0 h-screen w-full bg-white/90 dark:bg-gray-900/90 z-50' : ''}`}>
       <div 
-        className="loading-spinner"
-        style={{ 
-          width: `${spinnerSize}px`, 
-          height: `${spinnerSize}px` 
-        }}
+        className={`${spinnerSize} border-4 border-gray-200 border-l-blue-600 rounded-full animate-spin mb-4`}
       />
-      {text && <p className="loading-text">{text}</p>}
-      
-      <style jsx>{`
-        .loading-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 1rem;
-        }
-        
-        .fullscreen {
-          height: 100vh;
-          width: 100%;
-          position: fixed;
-          top: 0;
-          left: 0;
-          background-color: var(--bg-primary);
-          opacity: 0.9;
-          z-index: 1000;
-        }
-        
-        .loading-spinner {
-          border: 4px solid var(--card-border);
-          border-left: 4px solid var(--primary-color);
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-          margin-bottom: 1rem;
-        }
-        
-        .loading-text {
-          color: var(--text-secondary);
-          font-size: ${size === 'small' ? '0.85rem' : size === 'large' ? '1.2rem' : '1rem'};
-          margin: 0;
-        }
-        
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
+      {text && <p className={`${textSize} text-gray-600 dark:text-gray-400 m-0`}>{text}</p>}
     </div>
   );
 };

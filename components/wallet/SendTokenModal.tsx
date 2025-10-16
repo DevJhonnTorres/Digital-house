@@ -164,12 +164,12 @@ const SendTokenModalTailwind: React.FC<SendTokenModalProps> = ({
                 {txHash}
               </p>
               <a 
-                href={`https://optimistic.etherscan.io/tx/${txHash}`} 
+                href={`https://sepolia.etherscan.io/tx/${txHash}`} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="inline-block mt-2 text-blue-600 dark:text-blue-400 hover:underline"
               >
-                View on Optimism Explorer
+                View on Sepolia Explorer
               </a>
             </div>
           )}
